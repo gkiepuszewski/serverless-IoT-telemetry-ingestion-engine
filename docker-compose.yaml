@@ -1,0 +1,55 @@
+services:
+  # Main LocalStack container emulating AWS services
+  localstack:
+    container_name: localstack_iot_engine
+    image: localstack/localstack:3.8
+    ports:
+      - "127.0.0.1:4566:4566"            # Main port for all AWS API services
+      - "127.0.0.1:4510-4559:4510-4559"  # External ports required e.g. by AWS Lambda
+    environment:
+      - SERVICES=dynamodb,lambda,sqs,sns,kinesis # Activation of the selected cloud services
+      - AWS_DEFAULT_REGION=us-east-1
+      - DOCKER_HOST=unix:///var/run/docker.sock # Allows LocalStack to spin up Lambda containers (Docker-in-Docker)
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./.localstack}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      # Mount the startup script into LocalStack's special directory:
+      - ./init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh
+    networks:
+      - iot_network
+
+  # MQTT broker (Mosquitto) serving as a stand-in for AWS IoT Core
+  mosquitto:
+    container_name: mosquitto_mqtt_broker
+    image: eclipse-mosquitto:latest
+    ports:
+      - "1883:1883"                      # Standard, unencrypted MQTT port
+      - "9001:9001"                      # WebSockets port (optional, for a frontend)
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    networks:
+      - iot_network
+    depends_on:
+      - localstack
+
+  # Lightweight web UI for browsing DynamoDB (LocalStack) tables/records in the browser
+  dynamodb-admin:
+    container_name: dynamodb_admin_ui
+    image: aaronshaf/dynamodb-admin:latest
+    ports:
+      - "127.0.0.1:8001:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://localstack:4566
+      - AWS_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test          # LocalStack ignores the value - it only needs it to be present
+      - AWS_SECRET_ACCESS_KEY=test
+    networks:
+      - iot_network
+    depends_on:
+      - localstack
+
+networks:
+  iot_network:
+    driver: bridge

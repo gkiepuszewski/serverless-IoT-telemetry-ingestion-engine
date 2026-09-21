@@ -1,0 +1,10 @@
+{
+  "TableName": "FleetManagement",
+  "Item": {
+    "PK": {"S": "CUSTOMER#101"},
+    "SK": {"S": "DEVICE#VIN-HEAVY-TRUCK-99"},
+    "EntityType": {"S": "DEVICE"},
+    "DeviceModel": {"S": "CAT-797F"},
+    "DeviceStatus": {"S": "OPERATIONAL"}
+  }
+}

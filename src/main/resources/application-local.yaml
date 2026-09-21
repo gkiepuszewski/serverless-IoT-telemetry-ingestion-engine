@@ -1,0 +1,39 @@
+spring:
+  cloud:
+    aws:
+      region:
+        static: us-east-1
+      credentials:
+        # LocalStack accepts any dummy credentials
+        access-key: test-access-key
+        secret-key: test-secret-key
+      # Override the global AWS endpoints to point at the LocalStack container
+      endpoint: http://localhost:4566
+
+      sqs:
+        # SQS Listener behavior configuration for the local environment
+        listener:
+          max-concurrent-messages: 10
+          max-messages-per-poll: 10
+
+# Custom auto-startup switch for the SQS listener (see SqsListenerConfig)
+app:
+  sqs:
+    listener:
+      auto-startup: true
+
+# MQTT broker (Mosquitto) connection configuration - a local substitute for AWS IoT Core
+# (a paid service in real AWS). Mosquitto + this bridge (MqttTelemetryBridge) play the role
+# of the "IoT Core Rules Engine": they receive MQTT publishes from simulated devices and
+# translate them into SQS messages in the same format expected by the rest of the system.
+mqtt:
+  enabled: true
+  broker-url: tcp://localhost:1883
+  client-id: heavy-equipment-engine-local
+  telemetry-topic: machines/+/+/telemetry
+
+logging:
+  level:
+    root: INFO
+    io.awspring.cloud: DEBUG
+    software.amazon.awssdk: INFO

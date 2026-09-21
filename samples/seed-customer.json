@@ -1,0 +1,11 @@
+{
+  "TableName": "FleetManagement",
+  "Item": {
+    "PK": {"S": "CUSTOMER#101"},
+    "SK": {"S": "METADATA"},
+    "EntityType": {"S": "CUSTOMER"},
+    "CustomerName": {"S": "Heavy Equipment Sp. z o.o."},
+    "CustomerEmail": {"S": "fleet@example.com"},
+    "PremiumSupportActive": {"BOOL": true}
+  }
+}

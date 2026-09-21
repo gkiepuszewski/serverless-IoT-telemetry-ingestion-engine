@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: serverless-IoT-telemetry-ingestion-engine
+  cloud:
+    aws:
+      # Default region used when AWS_REGION isn't defined in the environment (e.g. when running
+      # just the Spring context without the 'local'/LocalStack profile, like in a plain context test).
+      region:
+        static: us-east-1
+
+# The AWS IoT Core simulation (a paid service in real AWS) is disabled by default -
+# explicitly activated only in the 'local' profile together with the Mosquitto broker (docker-compose.yaml).
+mqtt:
+  enabled: false
